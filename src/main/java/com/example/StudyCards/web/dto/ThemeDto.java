@@ -3,8 +3,10 @@ package com.example.StudyCards.web.dto;
 import lombok.Data;
 
 @Data
-public class ErrorDto {
+public class ThemeDto {
 
-    private String message;
+    private Long id;
+
+    private String title;
 
 }
