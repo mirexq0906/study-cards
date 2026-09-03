@@ -1,9 +1,9 @@
 package com.example.StudyCards.service.impl;
 
 import com.example.StudyCards.entity.Card;
+import com.example.StudyCards.exception.EntityNotFoundException;
 import com.example.StudyCards.repository.CardRepository;
 import com.example.StudyCards.service.CardService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
 
-    private CardRepository cardRepository;
+    private final CardRepository cardRepository;
 
     @Override
     public List<Card> getByFolderId(Long folderId) {
