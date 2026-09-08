@@ -68,15 +68,7 @@ watch(() => [props.themeId, props.folderId], load)
           @click="router.push({ name: 'folders', params: { themeId } })"
         />
       </div>
-      <div class="title-row">
-        <h1 class="page-title">{{ folderTitle }}</h1>
-        <Tag
-          v-if="!loading && cards.length"
-          :value="`${page + 1} / ${cards.length}`"
-          severity="secondary"
-          rounded
-        />
-      </div>
+      <h1 class="page-title">{{ folderTitle }}</h1>
       <p class="page-subtitle">
         Листайте карточки и нажимайте на них, чтобы увидеть ответ и пример кода.
       </p>
@@ -100,7 +92,7 @@ watch(() => [props.themeId, props.folderId], load)
         :num-visible="1"
         :num-scroll="1"
         :circular="false"
-        :show-indicators="cards.length > 1"
+        :show-indicators="false"
         :show-navigators="cards.length > 1"
       >
         <template #item="slotProps">
@@ -109,6 +101,9 @@ watch(() => [props.themeId, props.folderId], load)
           </div>
         </template>
       </Carousel>
+      <div class="carousel-counter">
+        <Tag :value="`${page + 1} / ${cards.length}`" severity="secondary" rounded />
+      </div>
     </section>
   </main>
 </template>
@@ -118,15 +113,14 @@ watch(() => [props.themeId, props.folderId], load)
   margin-left: -0.75rem;
 }
 
-.title-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
 .carousel-wrap {
   animation: rise 0.45s ease-out both;
+}
+
+.carousel-counter {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
 }
 
 .slide {
@@ -144,16 +138,6 @@ watch(() => [props.themeId, props.folderId], load)
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(15, 118, 110, 0.15);
   box-shadow: 0 10px 24px rgba(15, 61, 52, 0.1);
-}
-
-.cards-page :deep(.p-carousel-indicator-button) {
-  width: 0.65rem;
-  height: 0.65rem;
-  background: rgba(15, 118, 110, 0.25);
-}
-
-.cards-page :deep(.p-carousel-indicator-active .p-carousel-indicator-button) {
-  background: #0f766e;
 }
 
 @keyframes rise {

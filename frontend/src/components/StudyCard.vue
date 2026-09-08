@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import {computed, ref, watch} from 'vue'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-java'
 import 'prismjs/components/prism-sql'
@@ -71,8 +71,11 @@ watch(
 
       <div class="face face-back">
         <p class="face-label">Ответ</p>
-        <p v-if="card.description" class="description">{{ card.description }}</p>
-        <pre v-if="card.code" class="code-block"><code :class="`language-${language}`" v-html="highlightedCode" /></pre>
+        <div class="face-content">
+          <div v-if="card.description" class="description">{{ card.description }}</div>
+          <pre v-if="card.code" class="code-block"><code :class="`language-${language}`"
+                                                         v-html="highlightedCode"/></pre>
+        </div>
         <p class="face-hint">Нажмите, чтобы вернуть вопрос</p>
       </div>
     </div>
@@ -83,7 +86,7 @@ watch(
 <style scoped>
 .study-card {
   display: block;
-  width: min(100%, 640px);
+  width: min(100%, 700px);
   margin: 0 auto;
   padding: 0;
   border: 0;
@@ -113,21 +116,36 @@ watch(
   padding: 1.75rem;
   border-radius: 1.5rem;
   border: 1px solid rgba(15, 118, 110, 0.14);
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(236, 253, 245, 0.92));
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(236, 253, 245, 0.92));
   box-shadow: 0 24px 50px rgba(15, 61, 52, 0.14);
   backface-visibility: hidden;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .face-front {
-  justify-content: center;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   align-items: center;
   text-align: center;
 }
 
 .face-back {
   transform: rotateY(180deg);
+}
+
+.face-back > .face-label,
+.face-back > .face-hint {
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.face-content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
 }
 
 .face-label {
@@ -141,9 +159,8 @@ watch(
 
 .face-front h3 {
   margin: 0;
-  max-width: 18ch;
-  font-size: clamp(1.5rem, 4vw, 2.1rem);
-  line-height: 1.2;
+  font-size: clamp(1.35rem, 3.6vw, 1.9rem);
+  line-height: 1.25;
   letter-spacing: -0.03em;
 }
 
@@ -151,15 +168,18 @@ watch(
   margin: 0;
   color: #274841;
   font-size: 1.05rem;
-  line-height: 1.55;
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 .code-block {
+  flex-shrink: 0;
   margin: 0;
   padding: 1rem 1.1rem;
   border-radius: 0.9rem;
   background: #1e293b;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .code-block code {
@@ -170,7 +190,7 @@ watch(
 }
 
 .face-hint {
-  margin-top: auto;
+  margin-top: 0;
   margin-bottom: 0;
   color: #6b857e;
   font-size: 0.9rem;

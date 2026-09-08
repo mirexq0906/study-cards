@@ -2,7 +2,7 @@ spring:
   application:
     name: StudyCards
   datasource:
-    url: jdbc:h2:mem:studycards
+    url: jdbc:h2:mem:studycards;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -13,5 +13,8 @@ spring:
     hibernate:
       ddl-auto: validate
   flyway:
-
     enabled: true
+
+app:
+  import:
+    location: file:./data/output/java-skillbox.json
