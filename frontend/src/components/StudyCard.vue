@@ -56,6 +56,13 @@ function onFavoriteClick() {
   emit('toggle-favorite')
 }
 
+function onCardKeydown(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    toggleFlip()
+  }
+}
+
 watch(
   () => props.card.id,
   () => {
@@ -65,59 +72,78 @@ watch(
 </script>
 
 <template>
-  <div class="study-card-wrap">
-    <button
-      class="favorite-btn"
-      type="button"
-      :class="{ 'is-on': favorite }"
-      :aria-pressed="favorite"
-      :aria-label="favorite ? 'Убрать из избранного' : 'Добавить в избранное'"
-      @click="onFavoriteClick"
-    >
-      <i class="pi" :class="favorite ? 'pi-star-fill' : 'pi-star'" />
-    </button>
-
-    <button
-      class="study-card"
-      type="button"
-      :class="{ flipped }"
-      :aria-pressed="flipped"
-      @click="toggleFlip"
-    >
-      <div class="study-card-inner">
-        <div class="face face-front">
+  <div
+    class="study-card"
+    :class="{ flipped }"
+    role="button"
+    tabindex="0"
+    :aria-pressed="flipped"
+    @click="toggleFlip"
+    @keydown="onCardKeydown"
+  >
+    <div class="study-card-inner">
+      <div class="face face-front">
+        <div class="face-top">
           <p class="face-label">Вопрос</p>
-          <h3>{{ card.title }}</h3>
-          <p class="face-hint">Нажмите, чтобы перевернуть</p>
+          <button
+            class="favorite-btn"
+            type="button"
+            :class="{ 'is-on': favorite }"
+            :aria-pressed="favorite"
+            :aria-hidden="flipped"
+            :tabindex="flipped ? -1 : 0"
+            :aria-label="favorite ? 'Убрать из избранного' : 'Добавить в избранное'"
+            @click.stop="onFavoriteClick"
+          >
+            <i class="pi" :class="favorite ? 'pi-star-fill' : 'pi-star'" />
+          </button>
         </div>
-
-        <div class="face face-back">
-          <p class="face-label">Ответ</p>
-          <div class="face-content">
-            <div v-if="card.description" class="description">{{ card.description }}</div>
-            <pre v-if="card.code" class="code-block"><code :class="`language-${language}`"
-                                                           v-html="highlightedCode"/></pre>
-          </div>
-          <p class="face-hint">Нажмите, чтобы вернуть вопрос</p>
-        </div>
+        <h3>{{ card.title }}</h3>
+        <p class="face-hint">Нажмите, чтобы перевернуть</p>
       </div>
-    </button>
+
+      <div class="face face-back">
+        <div class="face-top">
+          <p class="face-label">Ответ</p>
+          <button
+            class="favorite-btn"
+            type="button"
+            :class="{ 'is-on': favorite }"
+            :aria-pressed="favorite"
+            :aria-hidden="!flipped"
+            :tabindex="flipped ? 0 : -1"
+            :aria-label="favorite ? 'Убрать из избранного' : 'Добавить в избранное'"
+            @click.stop="onFavoriteClick"
+          >
+            <i class="pi" :class="favorite ? 'pi-star-fill' : 'pi-star'" />
+          </button>
+        </div>
+        <div class="face-content">
+          <div v-if="card.description" class="description">{{ card.description }}</div>
+          <pre v-if="card.code" class="code-block"><code :class="`language-${language}`"
+                                                         v-html="highlightedCode"/></pre>
+        </div>
+        <p class="face-hint">Нажмите, чтобы вернуть вопрос</p>
+      </div>
+    </div>
   </div>
 </template>
 
 
 <style scoped>
-.study-card-wrap {
-  position: relative;
-  width: min(100%, 700px);
-  margin: 0 auto;
+.face-top {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 2.5rem;
+  align-items: center;
+}
+
+.face-top .face-label {
+  grid-column: 2;
+  text-align: center;
 }
 
 .favorite-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 2;
+  grid-column: 3;
   display: grid;
   place-items: center;
   width: 2.5rem;
@@ -152,7 +178,8 @@ watch(
 
 .study-card {
   display: block;
-  width: 100%;
+  width: min(100%, 700px);
+  margin: 0 auto;
   padding: 0;
   border: 0;
   background: transparent;
@@ -198,9 +225,12 @@ watch(
   transform: rotateY(180deg);
 }
 
-.face-back > .face-label,
+.face-back > .face-top,
 .face-back > .face-hint {
   flex-shrink: 0;
+}
+
+.face-back > .face-hint {
   text-align: center;
 }
 
@@ -224,7 +254,6 @@ watch(
 
 .face-front h3 {
   margin: 0;
-  padding-inline: 2.75rem;
   font-size: clamp(1.35rem, 3.6vw, 1.9rem);
   line-height: 1.25;
   letter-spacing: -0.03em;
