@@ -38,4 +38,4 @@ frontend/dist/
 
 ### Generated static assets ###
 src/main/resources/static/
-data
+data/text
