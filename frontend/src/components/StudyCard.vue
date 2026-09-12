@@ -10,7 +10,13 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const emit = defineEmits(['toggle-favorite'])
 
 const flipped = ref(false)
 
@@ -46,6 +52,10 @@ function toggleFlip() {
   flipped.value = !flipped.value
 }
 
+function onFavoriteClick() {
+  emit('toggle-favorite')
+}
+
 watch(
   () => props.card.id,
   () => {
@@ -55,39 +65,94 @@ watch(
 </script>
 
 <template>
-  <button
-    class="study-card"
-    type="button"
-    :class="{ flipped }"
-    :aria-pressed="flipped"
-    @click="toggleFlip"
-  >
-    <div class="study-card-inner">
-      <div class="face face-front">
-        <p class="face-label">Вопрос</p>
-        <h3>{{ card.title }}</h3>
-        <p class="face-hint">Нажмите, чтобы перевернуть</p>
-      </div>
+  <div class="study-card-wrap">
+    <button
+      class="favorite-btn"
+      type="button"
+      :class="{ 'is-on': favorite }"
+      :aria-pressed="favorite"
+      :aria-label="favorite ? 'Убрать из избранного' : 'Добавить в избранное'"
+      @click="onFavoriteClick"
+    >
+      <i class="pi" :class="favorite ? 'pi-star-fill' : 'pi-star'" />
+    </button>
 
-      <div class="face face-back">
-        <p class="face-label">Ответ</p>
-        <div class="face-content">
-          <div v-if="card.description" class="description">{{ card.description }}</div>
-          <pre v-if="card.code" class="code-block"><code :class="`language-${language}`"
-                                                         v-html="highlightedCode"/></pre>
+    <button
+      class="study-card"
+      type="button"
+      :class="{ flipped }"
+      :aria-pressed="flipped"
+      @click="toggleFlip"
+    >
+      <div class="study-card-inner">
+        <div class="face face-front">
+          <p class="face-label">Вопрос</p>
+          <h3>{{ card.title }}</h3>
+          <p class="face-hint">Нажмите, чтобы перевернуть</p>
         </div>
-        <p class="face-hint">Нажмите, чтобы вернуть вопрос</p>
+
+        <div class="face face-back">
+          <p class="face-label">Ответ</p>
+          <div class="face-content">
+            <div v-if="card.description" class="description">{{ card.description }}</div>
+            <pre v-if="card.code" class="code-block"><code :class="`language-${language}`"
+                                                           v-html="highlightedCode"/></pre>
+          </div>
+          <p class="face-hint">Нажмите, чтобы вернуть вопрос</p>
+        </div>
       </div>
-    </div>
-  </button>
+    </button>
+  </div>
 </template>
 
 
 <style scoped>
-.study-card {
-  display: block;
+.study-card-wrap {
+  position: relative;
   width: min(100%, 700px);
   margin: 0 auto;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #b7a056;
+  box-shadow: 0 8px 18px rgba(15, 61, 52, 0.1);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease,
+    background 0.18s ease;
+}
+
+.favorite-btn i {
+  font-size: 1.15rem;
+}
+
+.favorite-btn.is-on {
+  color: #eab308;
+}
+
+.favorite-btn:hover,
+.favorite-btn:focus-visible {
+  transform: scale(1.08);
+  background: #fff;
+  outline: none;
+}
+
+.study-card {
+  display: block;
+  width: 100%;
   padding: 0;
   border: 0;
   background: transparent;
@@ -159,6 +224,7 @@ watch(
 
 .face-front h3 {
   margin: 0;
+  padding-inline: 2.75rem;
   font-size: clamp(1.35rem, 3.6vw, 1.9rem);
   line-height: 1.25;
   letter-spacing: -0.03em;
